@@ -4,8 +4,10 @@ import pandas as pd
 import numpy as np
 from streamlit_drawable_canvas import st_canvas
 import cv2
+from PIL import Image
 import os
 from tensorflow.keras.models import load_model
+import tensorflow as tf
 
 
 
@@ -46,21 +48,25 @@ if st.selectbox("Choose your page", ["Version 1", "Version 2"]) == "Version 1" :
 
         # Do something interesting with the image data and paths
     if canvas_result.image_data is not None:
-        st.image(canvas_result.image_data)
-        img = cv2.resize(canvas_result.image_data.astype("uint8"), (28,28))
-        rescaled = cv2.resize(img, (150, 150), interpolation=cv2.INTER_NEAREST)
-        st.write('Model Input')
-        st.image(rescaled)
+        img = canvas_result.image_data
+    
+        image = Image.fromarray((img[:, :, 0]).astype(np.uint8))
+        image = image.resize((28, 28))
+        image = image.convert('L')
+        image = (tf.keras.utils.img_to_array(image)/255)
+        image = image.reshape(1,28,28,1)
+        test_x = tf.convert_to_tensor(image)
     #if canvas_result.json_data is not None:
     #    objects = pd.json_normalize(canvas_result.json_data["objects"]) # need to convert obj to str because PyArrow
     #    for col in objects.select_dtypes(include=['object']).columns:
     #        objects[col] = objects[col].astype("str")
     #    st.dataframe(objects)
         if st.button('Predict'):
-            test_x = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-            val = model.predict(test_x.reshape(1, 28, 28,1))
+            #test_x = cv2.cvtColor(img2, cv2.COLOR_BGR2GRAY)
+            val = model.predict(test_x)
+            #.reshape(-1, 28, 28,1))
             st.write(f'result: {np.argmax(val[0])}')
-            st.bar_chart(val[0])           
+            st.bar_chart(val[0])         
 else : 
     st.title("Currently in maintenance please come back in a few days ...")
     df_test = pd.read_csv("test.csv")
