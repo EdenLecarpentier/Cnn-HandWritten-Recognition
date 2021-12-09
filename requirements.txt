@@ -1,4 +1,4 @@
-Python==3.9.6
+Python==3.8.8
 tensorboard==2.7.0
 tensorboard-data-server==0.6.1
 tensorboard-plugin-wit==1.8.0

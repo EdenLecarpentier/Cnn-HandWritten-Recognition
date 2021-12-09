@@ -9,7 +9,7 @@ import streamlit as st
 from streamlit_drawable_canvas import st_canvas
 import wget
 import cv2
-from pyngrok import ngrok
+
 
 from PIL import Image
 
